@@ -246,7 +246,7 @@ jobs:
 
       - name: Patch toml
         run: |
-          if [[ $TARGET == *"-musl"* || $TARGET == "arm"* || $TARGET == "risc"* || $TARGET == "mips"* ]]; then
+          if [[ $TARGET == *"-musl"* || $TARGET == "arm"* || $TARGET == "risc"* || $TARGET == "mips"* || $TARGET == "powerpc"* || $TARGET == *"android" || $TARGET = i*86-unknown-linux-gnu ]]; then
             cd $ADHAMMER_ROOT_DIR
             sed -Ei 's|^native-tls = "([^"]+)"$|native-tls = { version = "\1", features = ["vendored"] }|' crates/collector/Cargo.toml
             grep -R 'vendored' -n .
