@@ -60,7 +60,7 @@ jobs:
         id: release_version_cargo_get
         uses: nicolaiunrein/cargo-get@master
         with:
-          subcommand: package.version
+          subcommand: workspace.package.version
           options: --entry "$ADHAMMER_ROOT_DIR/Cargo.toml"
 
       - name: Set ADHAMMER_VERSION build variable
