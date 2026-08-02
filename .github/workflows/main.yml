@@ -210,7 +210,7 @@ jobs:
           
           if [[ $OS == ubuntu* ]]; then
             $APT update 
-            $APT install libssl-dev pkg-config
+            #$APT install libssl-dev pkg-config
           fi
 
           # for musl builds
@@ -248,8 +248,8 @@ jobs:
         run: |
           if [[ $TARGET == *"-musl"* || $TARGET == "arm"* || $TARGET == "risc"* || $TARGET == "mips"* ]]; then
             cd $ADHAMMER_ROOT_DIR
-            sed -i 's/features = \["tls-native"\]/features = ["tls-rustls"]/g' Cargo.toml
-            grep -i "tls" Cargo.toml
+            sed -Ei 's|^native-tls = "([^"]+)"$|native-tls = { version = "\1", features = ["vendored"] }|' crates/collector/Cargo.toml
+            grep -R 'vendored' -n .
           fi
         
       - name: Run build
