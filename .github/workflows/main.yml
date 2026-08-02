@@ -243,6 +243,14 @@ jobs:
           else
             rustup target add $TARGET
           fi
+
+      - name: Patch toml
+        run: |
+          if [[ $TARGET == *"-musl"* || $TARGET == "arm"* || $TARGET == "risc"* || $TARGET == "mips"* ]]; then
+            cd $ADHAMMER_ROOT_DIR
+            sed -i 's/features = \["tls-native"\]/features = ["tls-rustls"]/g' Cargo.toml
+            grep -i "tls" Cargo.toml
+          fi
         
       - name: Run build
         run: |
