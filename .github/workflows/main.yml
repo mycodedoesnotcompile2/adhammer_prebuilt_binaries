@@ -1,9 +1,9 @@
 name: Build binary
 
 on:
-  workflow_dispatch
-  # schedule:
-  #  - cron: '5 5 * * *'
+  #workflow_dispatch
+  schedule:
+   - cron: '5 5 * * *'
 
 permissions:
   contents: write
@@ -244,7 +244,7 @@ jobs:
             rustup target add $TARGET
           fi
 
-      - name: Patch toml
+      - name: Patch openssl requirement in Cargo.toml
         run: |
           if [[ $TARGET == *"-musl"* || $TARGET == "arm"* || $TARGET == "risc"* || $TARGET == "mips"* || $TARGET == "powerpc"* || $TARGET == *"android" || $TARGET = i*86-unknown-linux-gnu ]]; then
             cd $ADHAMMER_ROOT_DIR
