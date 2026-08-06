@@ -175,7 +175,7 @@ jobs:
             
           - TARGET: mips64el-unknown-linux-gnuabi64
             OS: ubuntu-latest
-            CC_PKG: gcc-mips64el-linux-gnuabi64 g++-mips64el-linux-gnuabi64
+            CC_PKG: gcc-mips64el-linux-gnuabi64 g++-mips64el-linux-gnuabi64 binutils-mips64el-linux-gnuabi64
            
           - TARGET: mips64el-unknown-linux-muslabi64
             OS: ubuntu-latest
@@ -267,7 +267,7 @@ jobs:
           fi
           
           if [[ $TARGET == "mips"* ]]; then
-            $CC_COMPILER +nightly build -Z build-std=std,panic_abort -p "$ADHAMMER_BIN_NAME" --release --target $TARGET --no-default-features --features tls-native -vv
+            $CC_COMPILER +nightly build -Z build-std=std,panic_abort -p "$ADHAMMER_BIN_NAME" --release --target $TARGET --no-default-features --features tls-native -C lto=off -vv
           else
             $CC_COMPILER build -p "$ADHAMMER_BIN_NAME" --release --target $TARGET --no-default-features --features tls-native
           fi
