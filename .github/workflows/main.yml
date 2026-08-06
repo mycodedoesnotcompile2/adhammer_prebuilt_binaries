@@ -250,12 +250,10 @@ jobs:
             cd $ADHAMMER_ROOT_DIR
             #sed -Ei 's|^native-tls = "([^"]+)"$|native-tls = { version = "\1", features = ["vendored"] }|' crates/collector/Cargo.toml
             
-            #sed -Ei \
-            #-e 's|^native-tls = "([^"]+)"$|native-tls = { version = "\1", features = ["vendored"] }|' \
-            #-e 's|^native-tls = \{(.*)\}$|native-tls = {\1, features = ["vendored"]}|' \
-            #crates/collector/Cargo.toml
-
-            sed -Ei 's|native-tls[[:space:]]*=[[:space:]]*\{[[:space:]]*version[[:space:]]*=[[:space:]]*"([^"]+)",[[:space:]]*optional[[:space:]]*=[[:space:]]*true[[:space:]]*\}|native-tls = { version = "\1", features = ["vendored"] }|' crates/collector/Cargo.toml
+            sed -Ei \
+            -e 's|^native-tls = "([^"]+)"$|native-tls = { version = "\1", features = ["vendored"] }|' \
+            -e 's|^native-tls = \{(.*)\}$|native-tls = {\1, features = ["vendored"]}|' \
+            crates/collector/Cargo.toml
             
             grep -R 'vendored' -n .
           fi
