@@ -267,7 +267,7 @@ jobs:
           fi
           
           if [[ $TARGET == "mips"* ]]; then
-            $CC_COMPILER +nightly build -Z build-std=std,panic_abort -p "$ADHAMMER_BIN_NAME" --release --target $TARGET --no-default-features --features tls-native -C lto=off -vv
+            $CC_COMPILER -C lto=off +nightly build -Z build-std=std,panic_abort -p "$ADHAMMER_BIN_NAME" --release --target $TARGET --no-default-features --features tls-native -vv
           else
             $CC_COMPILER build -p "$ADHAMMER_BIN_NAME" --release --target $TARGET --no-default-features --features tls-native
           fi
