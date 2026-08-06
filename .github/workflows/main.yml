@@ -257,6 +257,14 @@ jobs:
             
             grep -R 'vendored' -n .
           fi
+
+      - name: Patch lto in Cargo.toml for mips
+        run: |
+          if [[ $TARGET == "mips"* ]]; then
+            cd $ADHAMMER_ROOT_DIR
+            sed -i 's/^[[:space:]]*lto[[:space:]]*=.*/lto = false/' Cargo.toml
+            grep -i lto Cargo.toml
+          fi
         
       - name: Run build
         run: |
@@ -267,7 +275,7 @@ jobs:
           fi
           
           if [[ $TARGET == "mips"* ]]; then
-            CARGO_PROFILE_RELEASE_LTO=false RUSTFLAGS="-C link-arg=-mxgot" $CC_COMPILER +nightly build -Z build-std=std,panic_abort -Z build-std-features=panic_immediate_abort -p "$ADHAMMER_BIN_NAME" --release --target $TARGET --no-default-features --features tls-native -v
+            RUSTFLAGS="-C link-arg=-mxgot" $CC_COMPILER +nightly build -Z build-std=std,panic_abort -Z build-std-features=panic_immediate_abort -p "$ADHAMMER_BIN_NAME" --release --target $TARGET --no-default-features --features tls-native -v
           else
             $CC_COMPILER build -p "$ADHAMMER_BIN_NAME" --release --target $TARGET --no-default-features --features tls-native
           fi
