@@ -275,7 +275,7 @@ jobs:
           fi
           
           if [[ $TARGET == "mips"* ]]; then
-            RUSTFLAGS="-C link-arg=-mxgot" $CC_COMPILER +nightly build -Z build-std=std,panic_abort,compiler-builtins -Z build-std-features=panic_immediate_abort -p "$ADHAMMER_BIN_NAME" --release --target $TARGET --no-default-features --features tls-native -vv
+            RUSTFLAGS="-C link-arg=-mxgot" $CC_COMPILER +nightly build -Z build-std=std,panic_abort,compiler_builtins -Z build-std-features=panic_immediate_abort -p "$ADHAMMER_BIN_NAME" --release --target $TARGET --no-default-features --features tls-native -vv
           else
             $CC_COMPILER build -p "$ADHAMMER_BIN_NAME" --release --target $TARGET --no-default-features --features tls-native
           fi
