@@ -250,7 +250,7 @@ jobs:
             cd $ADHAMMER_ROOT_DIR
             #sed -Ei 's|^native-tls = "([^"]+)"$|native-tls = { version = "\1", features = ["vendored"] }|' crates/collector/Cargo.toml
             
-            sed -Ei \
+            #sed -Ei \
             -e 's|^native-tls = "([^"]+)"$|native-tls = { version = "\1", features = ["vendored"] }|' \
             -e 's|^native-tls = \{(.*)\}$|native-tls = {\1, features = ["vendored"]}|' \
             crates/collector/Cargo.toml
