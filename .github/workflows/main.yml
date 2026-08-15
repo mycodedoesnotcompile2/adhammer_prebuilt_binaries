@@ -232,7 +232,6 @@ jobs:
           if [[ $TARGET == "mips"* ]]; then
             rustup toolchain install nightly
             rustup component add rust-src --toolchain nightly
-            rustup target add "$TARGET" --toolchain nightly
           else
             rustup target add $TARGET
           fi
