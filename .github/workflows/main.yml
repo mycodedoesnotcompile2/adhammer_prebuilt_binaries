@@ -86,6 +86,8 @@ jobs:
       matrix:
         include:
 
+          # disabled targets are because of "ring" incompatibility/bug
+          
           # ============================================================
           # x86_64 Linux
           # ============================================================
@@ -260,9 +262,9 @@ jobs:
             OS: windows-11-arm
             TLS: openssl
 
-          - TARGET: aarch64-pc-windows-msvc
-            OS: windows-11-arm
-            TLS: rustls
+          # - TARGET: aarch64-pc-windows-msvc
+          #   OS: windows-11-arm
+          #   TLS: rustls
 
           - TARGET: i686-pc-windows-msvc
             OS: windows-latest
@@ -307,20 +309,20 @@ jobs:
             CC_PKG: gcc-riscv64-linux-gnu
             TLS: openssl
 
-          - TARGET: riscv64gc-unknown-linux-gnu
-            OS: ubuntu-latest
-            CC_PKG: gcc-riscv64-linux-gnu
-            TLS: rustls
+          # - TARGET: riscv64gc-unknown-linux-gnu
+          #   OS: ubuntu-latest
+          #   CC_PKG: gcc-riscv64-linux-gnu
+          #   TLS: rustls
 
           - TARGET: riscv64gc-unknown-linux-musl
             OS: ubuntu-latest
             CC_COMPILER: cross
             TLS: openssl
 
-          - TARGET: riscv64gc-unknown-linux-musl
-            OS: ubuntu-latest
-            CC_COMPILER: cross
-            TLS: rustls
+          # - TARGET: riscv64gc-unknown-linux-musl
+          #   OS: ubuntu-latest
+          #   CC_COMPILER: cross
+          #   TLS: rustls
 
 
           # ============================================================
@@ -332,10 +334,15 @@ jobs:
             CC_COMPILER: cross
             TLS: openssl
 
-          - TARGET: powerpc64le-unknown-linux-gnu
+          - TARGET: powerpc64-unknown-linux-gnu
             OS: ubuntu-latest
             CC_COMPILER: cross
-            TLS: rustls
+            TLS: openssl
+
+          # - TARGET: powerpc64le-unknown-linux-gnu
+          #   OS: ubuntu-latest
+          #   CC_COMPILER: cross
+          #   TLS: rustls
 
 
           # ============================================================
@@ -372,22 +379,22 @@ jobs:
             CC_PKG: gcc-mips64el-linux-gnuabi64 g++-mips64el-linux-gnuabi64 binutils-mips64el-linux-gnuabi64
             CC_COMPILER: cross
             TLS: openssl
-
-          - TARGET: mips64el-unknown-linux-gnuabi64
-            OS: ubuntu-latest
-            CC_PKG: gcc-mips64el-linux-gnuabi64 g++-mips64el-linux-gnuabi64 binutils-mips64el-linux-gnuabi64
-            CC_COMPILER: cross
-            TLS: rustls
-
+          
           - TARGET: mips64el-unknown-linux-muslabi64
             OS: ubuntu-latest
             CC_COMPILER: cross
             TLS: openssl
+        
+        # - TARGET: mips64el-unknown-linux-gnuabi64
+          #   OS: ubuntu-latest
+          #   CC_PKG: gcc-mips64el-linux-gnuabi64 g++-mips64el-linux-gnuabi64 binutils-mips64el-linux-gnuabi64
+          #   CC_COMPILER: cross
+          #   TLS: rustls
 
-          - TARGET: mips64el-unknown-linux-muslabi64
-            OS: ubuntu-latest
-            CC_COMPILER: cross
-            TLS: rustls
+          # - TARGET: mips64el-unknown-linux-muslabi64
+          #   OS: ubuntu-latest
+          #   CC_COMPILER: cross
+          #   TLS: rustls
 
 
     runs-on: ${{ matrix.OS }}
