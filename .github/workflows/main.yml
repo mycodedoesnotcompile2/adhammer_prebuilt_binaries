@@ -168,6 +168,7 @@ jobs:
           - TARGET: mips64el-unknown-linux-gnuabi64
             OS: ubuntu-latest
             CC_PKG: gcc-mips64el-linux-gnuabi64 g++-mips64el-linux-gnuabi64 binutils-mips64el-linux-gnuabi64
+            CC_COMPILER: cross
            
           - TARGET: mips64el-unknown-linux-muslabi64
             OS: ubuntu-latest
