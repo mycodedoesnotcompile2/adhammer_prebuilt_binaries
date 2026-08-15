@@ -242,7 +242,7 @@ jobs:
           cd $ADHAMMER_ROOT_DIR
           #sed -Ei 's/^([[:space:]]*rustls[[:space:]]*=[[:space:]]*)"([^"]+)"[[:space:]]*$/\1{ version = "\2", features = ["dangerous_configuration"] }/' cli/Cargo.toml
           
-          sed -E -i '' 's/^([[:space:]]*rustls[[:space:]]*=[[:space:]]*)"([^"]+)"[[:space:]]*$/\1{ version = "\2", features = ["dangerous_configuration"] }/' cli/Cargo.toml
+          #sed -E -i '' 's/^([[:space:]]*rustls[[:space:]]*=[[:space:]]*)"([^"]+)"[[:space:]]*$/\1{ version = "\2", features = ["dangerous_configuration"] }/' cli/Cargo.toml
           grep -i "rustls" cli/Cargo.toml
           
           if [[ $TARGET == *"-musl"* || $TARGET == "arm"* || $TARGET == "risc"* || $TARGET == "mips"* || $TARGET == "powerpc"* || $TARGET == *"android" || $TARGET = i*86-unknown-linux-gnu ]]; then
