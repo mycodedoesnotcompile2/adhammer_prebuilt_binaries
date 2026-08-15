@@ -9,7 +9,7 @@ The building workflow is [here](https://github.com/mycodedoesnotcompile2/adhamme
 
 See the [Github release page](https://github.com/mycodedoesnotcompile2/adhammer_prebuilt_binaries/releases/latest/) of this repository to access prebuilt binaries for different:
 - OSes: Linux, Windows, MacOS, Android
-- architectures: x86, x64, arm5/7/64, powerpc64le, riscv64gc, mips64el
+- architectures: x86, x64, arm5/7/64, powerpc64le, powerpc64, riscv64gc, mips64el
 - libc: GNU, musl
 
 
