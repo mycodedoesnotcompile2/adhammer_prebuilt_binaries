@@ -27,7 +27,7 @@ jobs:
       ADHAMMER_PREBUILT_LATEST_TAG: ${{ steps.release_latest_tag.outputs.ADHAMMER_PREBUILT_LATEST_TAG }}
       ADHAMMER_CURRENT_COMMIT_ID: ${{ steps.release_commit_id.outputs.ADHAMMER_CURRENT_COMMIT_ID }}
       ADHAMMER_VERSION: ${{ steps.release_version.outputs.ADHAMMER_VERSION }}
-    
+
     steps:
       - name: Get latest release tag of this repo
         id: release_latest_tag
@@ -35,7 +35,15 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd /tmp/
-          ADHAMMER_PREBUILT_LATEST_TAG=$(gh release list -R mycodedoesnotcompile2/adhammer_prebuilt_binaries --json tagName -L 1 --jq '.[].tagName' --exclude-drafts --exclude-pre-releases)
+
+          ADHAMMER_PREBUILT_LATEST_TAG=$(gh release list \
+            -R mycodedoesnotcompile2/adhammer_prebuilt_binaries \
+            --json tagName \
+            -L 1 \
+            --jq '.[].tagName' \
+            --exclude-drafts \
+            --exclude-pre-releases)
+
           echo "ADHAMMER_PREBUILT_LATEST_TAG=$ADHAMMER_PREBUILT_LATEST_TAG" >> $GITHUB_OUTPUT
           echo "ADHAMMER_PREBUILT_LATEST_TAG=$ADHAMMER_PREBUILT_LATEST_TAG" >> $GITHUB_ENV
 
@@ -44,7 +52,7 @@ jobs:
         run: |
           cd /tmp/
           git clone --depth=1 "$ADHAMMER_REPO" "$ADHAMMER_BIN_NAME"
-
+          
           cd "$ADHAMMER_ROOT_DIR"
           ADHAMMER_CURRENT_COMMIT_ID=$(git rev-parse --short HEAD)
           echo "ADHAMMER_CURRENT_COMMIT_ID=$ADHAMMER_CURRENT_COMMIT_ID" >> $GITHUB_ENV
@@ -70,116 +78,326 @@ jobs:
           echo "ADHAMMER_VERSION=$ADHAMMER_VERSION" >> $GITHUB_OUTPUT
 
 
-  
   build:
     needs: checkout
+
     strategy:
       fail-fast: false
       matrix:
         include:
+
+          # ============================================================
+          # x86_64 Linux
+          # ============================================================
+
           - TARGET: x86_64-unknown-linux-musl
             OS: ubuntu-latest
-            
+            TLS: openssl
+
+          - TARGET: x86_64-unknown-linux-musl
+            OS: ubuntu-latest
+            TLS: rustls
+
           - TARGET: x86_64-unknown-linux-gnu
             OS: ubuntu-latest
-            
+            TLS: openssl
+
+          - TARGET: x86_64-unknown-linux-gnu
+            OS: ubuntu-latest
+            TLS: rustls
+
+
+          # ============================================================
+          # i686 Linux
+          # ============================================================
+
           - TARGET: i686-unknown-linux-gnu
             OS: ubuntu-latest
             CC_PKG: gcc-multilib
+            TLS: openssl
+
+          - TARGET: i686-unknown-linux-gnu
+            OS: ubuntu-latest
+            CC_PKG: gcc-multilib
+            TLS: rustls
 
           - TARGET: i686-unknown-linux-musl
             OS: ubuntu-latest
             CC_COMPILER: cross
             CC_PKG: gcc-multilib
-          
+            TLS: openssl
+
+          - TARGET: i686-unknown-linux-musl
+            OS: ubuntu-latest
+            CC_COMPILER: cross
+            CC_PKG: gcc-multilib
+            TLS: rustls
+
+
+          # ============================================================
+          # ARM64 Linux
+          # ============================================================
+
           - TARGET: aarch64-unknown-linux-musl
             OS: ubuntu-24.04-arm
-            
+            TLS: openssl
+
+          - TARGET: aarch64-unknown-linux-musl
+            OS: ubuntu-24.04-arm
+            TLS: rustls
+
           - TARGET: aarch64-unknown-linux-gnu
             OS: ubuntu-24.04-arm
-          
+            TLS: openssl
+
+          - TARGET: aarch64-unknown-linux-gnu
+            OS: ubuntu-24.04-arm
+            TLS: rustls
+
+
+          # ============================================================
+          # ARMv7 Linux
+          # ============================================================
+
           - TARGET: armv7-unknown-linux-musleabihf
             OS: ubuntu-latest
             CC_COMPILER: cross
-          
+            TLS: openssl
+
+          - TARGET: armv7-unknown-linux-musleabihf
+            OS: ubuntu-latest
+            CC_COMPILER: cross
+            TLS: rustls
+
           - TARGET: armv7-unknown-linux-gnueabihf
             OS: ubuntu-latest
             CC_PKG: crossbuild-essential-armhf
+            TLS: openssl
+
+          - TARGET: armv7-unknown-linux-gnueabihf
+            OS: ubuntu-latest
+            CC_PKG: crossbuild-essential-armhf
+            TLS: rustls
+
+
+          # ============================================================
+          # ARM Linux
+          # ============================================================
 
           - TARGET: arm-unknown-linux-musleabihf
             OS: ubuntu-latest
             CC_COMPILER: cross
-          
+            TLS: openssl
+
+          - TARGET: arm-unknown-linux-musleabihf
+            OS: ubuntu-latest
+            CC_COMPILER: cross
+            TLS: rustls
+
           - TARGET: arm-unknown-linux-gnueabihf
             OS: ubuntu-latest
             CC_PKG: gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+            TLS: openssl
+
+          - TARGET: arm-unknown-linux-gnueabihf
+            OS: ubuntu-latest
+            CC_PKG: gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+            TLS: rustls
 
           - TARGET: arm-unknown-linux-musleabi
             OS: ubuntu-latest
             CC_COMPILER: cross
-          
+            TLS: openssl
+
+          - TARGET: arm-unknown-linux-musleabi
+            OS: ubuntu-latest
+            CC_COMPILER: cross
+            TLS: rustls
+
+
+          # ============================================================
+          # Apple
+          # ============================================================
+
           - TARGET: aarch64-apple-darwin
             OS: macos-latest
+            TLS: openssl
+
+          - TARGET: aarch64-apple-darwin
+            OS: macos-latest
+            TLS: rustls
 
           - TARGET: x86_64-apple-darwin
             OS: macos-26-intel
-          
+            TLS: openssl
+
+          - TARGET: x86_64-apple-darwin
+            OS: macos-26-intel
+            TLS: rustls
+
+
+          # ============================================================
+          # Windows
+          # ============================================================
+
           - TARGET: x86_64-pc-windows-msvc
             OS: windows-latest
-            
+            TLS: openssl
+
+          - TARGET: x86_64-pc-windows-msvc
+            OS: windows-latest
+            TLS: rustls
+
           - TARGET: x86_64-pc-windows-gnu
             OS: windows-latest
-            
+            TLS: openssl
+
+          - TARGET: x86_64-pc-windows-gnu
+            OS: windows-latest
+            TLS: rustls
+
           - TARGET: aarch64-pc-windows-msvc
             OS: windows-11-arm
-          # ------------------------------
+            TLS: openssl
 
-          - TARGET: x86_64-unknown-freebsd
-            OS: ubuntu-latest
-            CC_COMPILER: cross
+          - TARGET: aarch64-pc-windows-msvc
+            OS: windows-11-arm
+            TLS: rustls
 
           - TARGET: i686-pc-windows-msvc
             OS: windows-latest
+            TLS: openssl
+
+          - TARGET: i686-pc-windows-msvc
+            OS: windows-latest
+            TLS: rustls
 
           - TARGET: i686-pc-windows-gnu
             OS: ubuntu-latest
             CC_PKG: gcc-mingw-w64-i686
+            TLS: openssl
+
+          - TARGET: i686-pc-windows-gnu
+            OS: ubuntu-latest
+            CC_PKG: gcc-mingw-w64-i686
+            TLS: rustls
+
+
+          # ============================================================
+          # FreeBSD
+          # ============================================================
+
+          - TARGET: x86_64-unknown-freebsd
+            OS: ubuntu-latest
+            CC_COMPILER: cross
+            TLS: openssl
+
+          - TARGET: x86_64-unknown-freebsd
+            OS: ubuntu-latest
+            CC_COMPILER: cross
+            TLS: rustls
+
+
+          # ============================================================
+          # RISC-V
+          # ============================================================
 
           - TARGET: riscv64gc-unknown-linux-gnu
             OS: ubuntu-latest
             CC_PKG: gcc-riscv64-linux-gnu
+            TLS: openssl
+
+          - TARGET: riscv64gc-unknown-linux-gnu
+            OS: ubuntu-latest
+            CC_PKG: gcc-riscv64-linux-gnu
+            TLS: rustls
 
           - TARGET: riscv64gc-unknown-linux-musl
             OS: ubuntu-latest
             CC_COMPILER: cross
+            TLS: openssl
+
+          - TARGET: riscv64gc-unknown-linux-musl
+            OS: ubuntu-latest
+            CC_COMPILER: cross
+            TLS: rustls
+
+
+          # ============================================================
+          # PowerPC
+          # ============================================================
 
           - TARGET: powerpc64le-unknown-linux-gnu
             OS: ubuntu-latest
             CC_COMPILER: cross
+            TLS: openssl
+
+          - TARGET: powerpc64le-unknown-linux-gnu
+            OS: ubuntu-latest
+            CC_COMPILER: cross
+            TLS: rustls
+
+
+          # ============================================================
+          # Android
+          # ============================================================
 
           - TARGET: aarch64-linux-android
             OS: ubuntu-latest
             CC_COMPILER: cross
-            
+            TLS: openssl
+
+          - TARGET: aarch64-linux-android
+            OS: ubuntu-latest
+            CC_COMPILER: cross
+            TLS: rustls
+
           - TARGET: armv7-linux-androideabi
             OS: ubuntu-latest
             CC_COMPILER: cross
-            
+            TLS: openssl
+
+          - TARGET: armv7-linux-androideabi
+            OS: ubuntu-latest
+            CC_COMPILER: cross
+            TLS: rustls
+
+
+          # ============================================================
+          # MIPS
+          # ============================================================
+
           - TARGET: mips64el-unknown-linux-gnuabi64
             OS: ubuntu-latest
             CC_PKG: gcc-mips64el-linux-gnuabi64 g++-mips64el-linux-gnuabi64 binutils-mips64el-linux-gnuabi64
             CC_COMPILER: cross
-           
+            TLS: openssl
+
+          - TARGET: mips64el-unknown-linux-gnuabi64
+            OS: ubuntu-latest
+            CC_PKG: gcc-mips64el-linux-gnuabi64 g++-mips64el-linux-gnuabi64 binutils-mips64el-linux-gnuabi64
+            CC_COMPILER: cross
+            TLS: rustls
+
           - TARGET: mips64el-unknown-linux-muslabi64
             OS: ubuntu-latest
             CC_COMPILER: cross
-            
+            TLS: openssl
+
+          - TARGET: mips64el-unknown-linux-muslabi64
+            OS: ubuntu-latest
+            CC_COMPILER: cross
+            TLS: rustls
+
+
     runs-on: ${{ matrix.OS }}
+
     container:
       image: ${{ matrix.CONTAINER }}
 
     env:
       TARGET: ${{ matrix.TARGET }}
+      TLS: ${{ matrix.TLS }}
       OS: ${{ matrix.OS }}
       CONTAINER: ${{ matrix.CONTAINER }}
       CC_PKG: ${{ matrix.CC_PKG }}
@@ -188,21 +406,21 @@ jobs:
 
       ADHAMMER_PREBUILT_LATEST_TAG: ${{ needs.checkout.outputs.ADHAMMER_PREBUILT_LATEST_TAG }}
       ADHAMMER_VERSION: ${{ needs.checkout.outputs.ADHAMMER_VERSION }}
-      
+
     steps:
       - name: Clone repo
         run: |
           cd /tmp/
           git clone --depth=1 "$ADHAMMER_REPO" "$ADHAMMER_BIN_NAME"
-      
+
       - name: Install and configure dependencies
         run: |
           if [[ $OS == windows* ]]; then
             $CHOCO wget
           fi
-          
+
           if [[ $OS == ubuntu* ]]; then
-            $APT update 
+            $APT update
             #$APT install libssl-dev pkg-config
           fi
 
@@ -221,13 +439,12 @@ jobs:
             cd "$ADHAMMER_ROOT_DIR"
             cargo install --force --locked bindgen-cli
           fi
-          
+
           cargo install cross
-          
+
           wget -nv "https://github.com/mycodedoesnotcompile2/rust_compile_config_files/raw/refs/heads/main/cross.toml" -O "$CROSS_CONFIG"
           wget -nv "https://github.com/mycodedoesnotcompile2/rust_compile_config_files/raw/refs/heads/main/config.toml" -O ~/.cargo/config.toml
 
-      
       - name: Install rust target
         run: |
           if [[ $TARGET == "mips"* ]]; then
@@ -239,75 +456,101 @@ jobs:
 
       - name: Patch stuff in Cargo.toml
         run: |
-          cd $ADHAMMER_ROOT_DIR
+          cd "$ADHAMMER_ROOT_DIR"
+
           #sed -Ei 's/^([[:space:]]*rustls[[:space:]]*=[[:space:]]*)"([^"]+)"[[:space:]]*$/\1{ version = "\2", features = ["dangerous_configuration"] }/' cli/Cargo.toml
-          
           #sed -E -i '' 's/^([[:space:]]*rustls[[:space:]]*=[[:space:]]*)"([^"]+)"[[:space:]]*$/\1{ version = "\2", features = ["dangerous_configuration"] }/' cli/Cargo.toml
           grep -i "rustls" cli/Cargo.toml
-          
-          if [[ $TARGET == *"-musl"* || $TARGET == "arm"* || $TARGET == "risc"* || $TARGET == "mips"* || $TARGET == "powerpc"* || $TARGET == *"android" || $TARGET = i*86-unknown-linux-gnu ]]; then
-            #sed -Ei 's|^native-tls = "([^"]+)"$|native-tls = { version = "\1", features = ["vendored"] }|' crates/collector/Cargo.toml
-            
+
+          # Only OpenSSL/native-tls builds need the native-tls vendored patch.
+          if [[ "$TLS" == "openssl" ]] && \
+             [[ $TARGET == *"-musl"* || \
+                $TARGET == "arm"* || \
+                $TARGET == "risc"* || \
+                $TARGET == "mips"* || \
+                $TARGET == "powerpc"* || \
+                $TARGET == *"android" || \
+                $TARGET = i*86-unknown-linux-gnu ]]; then
+
             sed -Ei \
-            -e 's|^native-tls = "([^"]+)"$|native-tls = { version = "\1", features = ["vendored"] }|' \
-            -e 's|^native-tls = \{(.*)\}$|native-tls = {\1, features = ["vendored"]}|' \
-            crates/collector/Cargo.toml
-           
+              -e 's|^native-tls = "([^"]+)"$|native-tls = { version = "\1", features = ["vendored"] }|' \
+              -e 's|^native-tls = \{(.*)\}$|native-tls = {\1, features = ["vendored"]}|' \
+              crates/collector/Cargo.toml
             grep -R 'vendored' -n .
           fi
 
       - name: Patch lto in Cargo.toml for mips
         run: |
           if [[ $TARGET == "mips"* ]]; then
-            cd $ADHAMMER_ROOT_DIR
+            cd "$ADHAMMER_ROOT_DIR"
             sed -i 's/^[[:space:]]*lto[[:space:]]*=.*/lto = false/' Cargo.toml
             grep -i lto Cargo.toml
           fi
-        
+
       - name: Run build
         run: |
-          cd $ADHAMMER_ROOT_DIR
+          cd "$ADHAMMER_ROOT_DIR"
 
           if [[ -z "${CC_COMPILER:-}" ]]; then
             CC_COMPILER="cargo"
           fi
-          
-          if [[ $TARGET == "mips"* ]]; then
-            RUSTFLAGS="${RUSTFLAGS:-} -C link-arg=-mxgot" $CC_COMPILER +nightly build -Z build-std=std,panic_abort,compiler_builtins -p "$ADHAMMER_BIN_NAME" --release --target $TARGET --no-default-features --features tls-native -v
-          else
-            $CC_COMPILER build -p "$ADHAMMER_BIN_NAME" --release --target $TARGET --no-default-features --features tls-native
+
+          BUILD_ARGS=(build -p "$ADHAMMER_BIN_NAME" --release --target "$TARGET")
+
+          # OpenSSL/native-tls build
+          if [[ "$TLS" == "openssl" ]]; then
+            BUILD_ARGS+=(--no-default-features --features tls-native)
           fi
-                
+
+          echo "=========================================="
+          echo "Building:"
+          echo "  Target: $TARGET"
+          echo "  TLS:    $TLS"
+          echo "  Args:   ${BUILD_ARGS[*]}"
+          echo "=========================================="
+
+          if [[ $TARGET == "mips"* ]]; then
+            RUSTFLAGS="${RUSTFLAGS:-} -C link-arg=-mxgot" \
+              $CC_COMPILER +nightly \
+              "${BUILD_ARGS[@]}" \
+              -Z build-std=std,panic_abort,compiler_builtins \
+              -v
+          else
+            $CC_COMPILER "${BUILD_ARGS[@]}"
+          fi
+
       - name: List build information
         run: |
           OLD_ADHAMMER_BIN_DIR="$ADHAMMER_ROOT_DIR/target/$TARGET/release"
           OLD_ADHAMMER_BIN_PATH="$OLD_ADHAMMER_BIN_DIR/$ADHAMMER_BIN_NAME"
+
           ls -alh "$OLD_ADHAMMER_BIN_DIR"
+
           if [[ $TARGET == *-windows-* ]]; then
             OLD_ADHAMMER_BIN_PATH="$OLD_ADHAMMER_BIN_DIR/$ADHAMMER_BIN_NAME.exe"
           fi
-          
-          ADHAMMER_BIN_PATH="${{ runner.temp }}/$ADHAMMER_BIN_NAME-$ADHAMMER_VERSION-$TARGET"
+
+          ADHAMMER_BIN_PATH="${{ runner.temp }}/$ADHAMMER_BIN_NAME-$ADHAMMER_VERSION-$TARGET-$TLS"
+
           if [[ $OS == windows* || $TARGET == *-windows-* ]]; then
-            ADHAMMER_BIN_PATH="${{ runner.temp }}/$ADHAMMER_BIN_NAME-$ADHAMMER_VERSION-$TARGET.exe"
+            ADHAMMER_BIN_PATH="${{ runner.temp }}/$ADHAMMER_BIN_NAME-$ADHAMMER_VERSION-$TARGET-$TLS.exe"
           fi
+
           ADHAMMER_BIN_HASH_PATH="$ADHAMMER_BIN_PATH.sha256.txt"
-          
           cp -f "$OLD_ADHAMMER_BIN_PATH" "$ADHAMMER_BIN_PATH"
           ls -alh "$ADHAMMER_BIN_PATH"
-
           cd "$(dirname "$ADHAMMER_BIN_PATH")"
           sha256sum --tag "$(basename "$ADHAMMER_BIN_PATH")" | tee "$ADHAMMER_BIN_HASH_PATH"
           ldd "$ADHAMMER_BIN_PATH" || true
-          "$ADHAMMER_BIN_PATH" -h || true 
-          
+          "$ADHAMMER_BIN_PATH" -h || true
+
           echo "ADHAMMER_BIN_PATH=$ADHAMMER_BIN_PATH" >> $GITHUB_ENV
           echo "ADHAMMER_BIN_HASH_PATH=$ADHAMMER_BIN_HASH_PATH" >> $GITHUB_ENV
-        
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: binary-${{ matrix.TARGET }}
+          name: binary-${{ matrix.TARGET }}-${{ matrix.TLS }}
           path: |
             ${{ env.ADHAMMER_BIN_PATH }}
             ${{ env.ADHAMMER_BIN_HASH_PATH }}
@@ -316,22 +559,21 @@ jobs:
     needs: [checkout, build]
     runs-on: ubuntu-latest
     env:
-       ADHAMMER_CURRENT_COMMIT_ID: ${{ needs.checkout.outputs.ADHAMMER_CURRENT_COMMIT_ID }}
-       ADHAMMER_VERSION: ${{ needs.checkout.outputs.ADHAMMER_VERSION }}
-    
-    steps:
-     - name: Download Artifact
-       uses: actions/download-artifact@v8
-       with:
-        pattern: binary-*
-        merge-multiple: true
-        path: /tmp/results
+      ADHAMMER_CURRENT_COMMIT_ID: ${{ needs.checkout.outputs.ADHAMMER_CURRENT_COMMIT_ID }}
+      ADHAMMER_VERSION: ${{ needs.checkout.outputs.ADHAMMER_VERSION }}
 
-     - name: List target
-       run: |
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v8
+        with:
+          pattern: binary-*
+          merge-multiple: true
+          path: /tmp/results
+
+      - name: List target
+        run: |
           cd "/tmp/results"
           ls -alh
-  
           RELEASE_NOTES="/tmp/release_notes.txt"
           echo "RELEASE_NOTES=$RELEASE_NOTES" >> $GITHUB_ENV
           
@@ -340,13 +582,13 @@ jobs:
           
           mkdir -p "/tmp/hashes"
           mv -f *.sha256.txt "/tmp/hashes/"
-  
-     - name: Create a new Github release
-       uses: softprops/action-gh-release@718ea10b132b3b2eba29c1007bb80653f286566b #v3.0.1
-       with:
-         make_latest: true
-         body_path: ${{ env.RELEASE_NOTES }}
-         name: version ${{ env.ADHAMMER_VERSION }} - build ${{ env.ADHAMMER_CURRENT_COMMIT_ID }}
-         tag_name: ${{ env.ADHAMMER_CURRENT_COMMIT_ID }}
-         files: |
-           /tmp/results/${{ env.ADHAMMER_BIN_NAME }}-*
+
+      - name: Create a new Github release
+        uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 #v3.0.2
+        with:
+          make_latest: true
+          body_path: ${{ env.RELEASE_NOTES }}
+          name: version ${{ env.ADHAMMER_VERSION }} - build ${{ env.ADHAMMER_CURRENT_COMMIT_ID }}
+          tag_name: ${{ env.ADHAMMER_CURRENT_COMMIT_ID }}
+          files: |
+            /tmp/results/${{ env.ADHAMMER_BIN_NAME }}-*
