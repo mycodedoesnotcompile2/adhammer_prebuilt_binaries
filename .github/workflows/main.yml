@@ -137,14 +137,6 @@ jobs:
           - TARGET: x86_64-unknown-freebsd
             OS: ubuntu-latest
             CC_COMPILER: cross
-            
-          - TARGET: i586-unknown-linux-gnu
-            OS: ubuntu-latest
-            CC_COMPILER: cross
-
-          - TARGET: i586-unknown-linux-musl
-            OS: ubuntu-latest
-            CC_COMPILER: cross
 
           - TARGET: i686-pc-windows-msvc
             OS: windows-latest
@@ -210,7 +202,7 @@ jobs:
           
           if [[ $OS == ubuntu* ]]; then
             $APT update 
-            $APT install libssl-dev pkg-config
+            #$APT install libssl-dev pkg-config
           fi
 
           # for musl builds
@@ -240,6 +232,7 @@ jobs:
           if [[ $TARGET == "mips"* ]]; then
             rustup toolchain install nightly
             rustup component add rust-src --toolchain nightly
+            rustup target add "$TARGET" --toolchain nightly
           else
             rustup target add $TARGET
           fi
@@ -247,8 +240,9 @@ jobs:
       - name: Patch stuff in Cargo.toml
         run: |
           cd $ADHAMMER_ROOT_DIR
+          #sed -Ei 's/^([[:space:]]*rustls[[:space:]]*=[[:space:]]*)"([^"]+)"[[:space:]]*$/\1{ version = "\2", features = ["dangerous_configuration"] }/' cli/Cargo.toml
           
-          sed -Ei 's/^([[:space:]]*rustls[[:space:]]*=[[:space:]]*)"([^"]+)"[[:space:]]*$/\1{ version = "\2", features = ["dangerous_configuration"] }/' cli/Cargo.toml
+          sed -E -i '' 's/^([[:space:]]*rustls[[:space:]]*=[[:space:]]*)"([^"]+)"[[:space:]]*$/\1{ version = "\2", features = ["dangerous_configuration"] }/' cli/Cargo.toml
           grep -i "rustls" cli/Cargo.toml
           
           if [[ $TARGET == *"-musl"* || $TARGET == "arm"* || $TARGET == "risc"* || $TARGET == "mips"* || $TARGET == "powerpc"* || $TARGET == *"android" || $TARGET = i*86-unknown-linux-gnu ]]; then
@@ -279,7 +273,7 @@ jobs:
           fi
           
           if [[ $TARGET == "mips"* ]]; then
-            RUSTFLAGS="-C link-arg=-mxgot" $CC_COMPILER +nightly build -Z build-std=std,panic_abort,compiler_builtins -Z build-std-features=panic_immediate_abort -p "$ADHAMMER_BIN_NAME" --release --target $TARGET --no-default-features --features tls-native -vv
+            RUSTFLAGS="${RUSTFLAGS:-} -C link-arg=-mxgot" $CC_COMPILER +nightly build -Z build-std=std,panic_abort,compiler_builtins -Z build-std-features=panic_immediate_abort -p "$ADHAMMER_BIN_NAME" --release --target $TARGET --no-default-features --features tls-native -vv
           else
             $CC_COMPILER build -p "$ADHAMMER_BIN_NAME" --release --target $TARGET --no-default-features --features tls-native
           fi
