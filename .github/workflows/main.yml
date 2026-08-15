@@ -210,7 +210,7 @@ jobs:
           
           if [[ $OS == ubuntu* ]]; then
             $APT update 
-            #$APT install libssl-dev pkg-config
+            $APT install libssl-dev pkg-config
           fi
 
           # for musl builds
