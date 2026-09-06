@@ -1,9 +1,9 @@
 name: Build binary
 
 on:
-  #workflow_dispatch
-  schedule:
-   - cron: '5 5 * * *'
+  workflow_dispatch
+  # schedule:
+  #  - cron: '5 5 * * *'
 
 permissions:
   contents: write
@@ -276,12 +276,12 @@ jobs:
 
           - TARGET: i686-pc-windows-gnu
             OS: ubuntu-latest
-            CC_PKG: gcc-mingw-w64-i686
+            CC_PKG: gcc-mingw-w64-i686 nasm
             TLS: openssl
 
           - TARGET: i686-pc-windows-gnu
             OS: ubuntu-latest
-            CC_PKG: gcc-mingw-w64-i686
+            CC_PKG: gcc-mingw-w64-i686 nasm
             TLS: rustls
 
 
