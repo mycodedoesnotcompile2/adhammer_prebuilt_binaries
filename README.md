@@ -11,7 +11,7 @@ See the [Github release page](https://github.com/mycodedoesnotcompile2/adhammer_
 - OSes: Linux, Windows, MacOS, Android
 - architectures: x86, x64, arm5/7/64, powerpc64le, powerpc64, riscv64gc, mips64el
 - libc: GNU, musl
-- TLS: rustls, OpenSSL
+- TLS stack: rustls, OpenSSL. The upstream project only provides rustls builds, I provide both.
 
 
 Copyright and license
