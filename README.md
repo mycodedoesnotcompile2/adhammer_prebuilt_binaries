@@ -16,5 +16,5 @@ See the [Github release page](https://github.com/mycodedoesnotcompile2/adhammer_
 
 Copyright and license
 ---------------------
-- All trademarks, service marks, trade names and product names appearing on this repository are the property of their respective owners
+- All trademarks, service marks, trade names, and product names referenced or displayed in this repository are the property of their respective owners. No ownership rights or affiliation with any such rights holders are implied.  
 - I don't work or be affiliated with the upstream project, but it is awesome.
